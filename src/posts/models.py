@@ -6,7 +6,9 @@ from django.core.urlresolvers import reverse
 from django.db.models.signals import pre_save
 
 from django.utils import timezone
+from django.utils.safestring import mark_safe
 from django.utils.text import slugify
+from markdown_deux import markdown
 
 
 class PostManager(models.Manager):
@@ -41,9 +43,14 @@ class Post(models.Model):
     def __str__(self):
         return self.title
 
-    def get_absolute_url(self):
+    def get_absolute_url(self):  # instance method
         return reverse("posts:detail", kwargs={"id": self.id}) # most dynamic way to do it
         # return"/posts/%s/" %(self.id)
+
+    def get_markdown(self):
+        content = self.content
+        markdown_text = markdown(content)
+        return mark_safe(markdown_text)
 
     # class Meta:
     #     ordering = ["-timestamp", "-updated"] # also by -id
