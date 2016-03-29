@@ -1,0 +1,11 @@
+bin
+lib
+*.pyc
+static_cdn
+media_cdn
+include
+*.sqlite3
+trydjango19.sublime-project
+trydjango19.sublime-workspace
+pip-selfcheck.json
+.Python
