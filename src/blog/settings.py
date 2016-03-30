@@ -28,13 +28,14 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 # django registration
-EMAIL_USE_TLS = True
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'officialtrydjango'
-EMAIL_HOST_PASSWORD = ''
-SERVER_EMAIL = 'officialtrydjango@gmail.com'
-DEFAULT_FROM_EMAIL = 'TryDjango'
-
+# EMAIL_USE_TLS = True
+# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_HOST_USER = 'Patrick Harding'
+# EMAIL_HOST_PASSWORD = ''
+# SERVER_EMAIL = 'harding1983@gmail.com'
+# DEFAULT_FROM_EMAIL = 'TryDjango'
+# email settings
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 ACCOUNT_ACTIVATION_DAYS = 7
 
 # Application definition
@@ -46,6 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'registration',
     'pagedown',
     'crispy_forms',
     'markdown_deux',
@@ -88,7 +90,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'blog.wsgi.application'
 
 ACCOUNT_ACTIVATION_DAYS = 7 # one-week activation window
-
+LOGIN_REDIRECT_URL = 'posts:list'
 # Database
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases
 
@@ -147,3 +149,5 @@ STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), "static_cdn")
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), "media_cdn")
+
+

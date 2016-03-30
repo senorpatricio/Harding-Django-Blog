@@ -18,6 +18,33 @@
     {% block head_extra %} {% endblock head_extra %}
 </head>
 <body>
+
+<ul class="nav nav-pills pull-left">
+    <li role="presentation"><a href="{% url 'posts:list' %}">Home</a></li>
+
+    <li role="presentation"><a href="{% url 'posts:create' %}">Create a post</a></li>
+    {% if user.is_authenticated %}
+    <li role="presentation"><h3>Welcome {% if user.get_full_name %}
+    {{ user.get_full_name }}
+    {% else %}
+    {{ user.username }}
+    {% endif %}!</h3></li>
+    {% endif %}
+</ul>
+
+<ul class="nav nav-pills pull-right">
+    {% if not user.is_authenticated %}
+    <li role="presentation"><a href="{% url 'auth_login' %}">Login</a></li>
+    <li role="presentation"><a href="{% url 'registration_register' %}">Register</a></li>
+    {% elif user.is_authenticated %}
+    <li role="presentation"><a href="#">Profile</a></li>
+    <li role="presentation"><a href="#">My Posts</a></li>
+    <li role="presentation"><a href="{% url 'auth_logout' %}">Logout</a></li>
+
+    {% endif %}
+
+</ul>
+
 <div id="fb-root"></div>
 <script>(function(d, s, id) {
   var js, fjs = d.getElementsByTagName(s)[0];
@@ -62,6 +89,12 @@
 
 <script type="text/javascript">
     $(document).ready(function(){
+
+        $(".comment-reply-btn").click(function(event){
+            event.preventDefault();
+            $(this).parent().next(".comment-reply").fadeToggle();
+        });
+
         $(".content-markdown").each(function(){
             var content = $(this).text();
             var markedContent = marked(content);
@@ -102,7 +135,9 @@
         titleInput.keyup(function () {
             var newContent = $(this).val();
             setTitle(newContent)
-        })
+        });
+
+
     });
 </script>
 </body>

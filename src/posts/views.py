@@ -4,7 +4,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
 from django.http import HttpResponse, HttpResponseRedirect, Http404  # We can use this to test our views also
 from django.shortcuts import render, get_object_or_404, redirect
-from django.utils import timezone
+from django.contrib.auth.decorators import login_required
 
 from .forms import PostForm
 from .models import Post
@@ -12,6 +12,7 @@ from comments.forms import CommentForm
 from comments.models import Comment
 # Create your views here.
 
+@login_required(login_url='/accounts/login')
 def post_create(request):
     if not request.user.is_authenticated():
         raise Http404
@@ -28,6 +29,7 @@ def post_create(request):
     }
     return render(request, "post_form.html", context)
 
+@login_required(login_url='/accounts/login')
 def post_detail(request, id=None):  # retrieve method
 
     instance = get_object_or_404(Post, id=id)
@@ -46,14 +48,26 @@ def post_detail(request, id=None):  # retrieve method
         content_type = ContentType.objects.get(model=c_type)
         obj_id = form.cleaned_data.get('object_id')
         content_data = form.cleaned_data.get('content')
+        parent_obj = None
+
+        try:
+            parent_id = request.POST.get("parent_id")
+        except:
+            parent_id = None
+
+        if parent_id:
+            parent_qs = Comment.objects.filter(id=parent_id)
+            if parent_qs.exists():
+                parent_obj = parent_qs.first()
+
         new_comment, created = Comment.objects.get_or_create(
             user = request.user,
             content_type = content_type,
             object_id = obj_id,
-            content = content_data
+            content = content_data,
+            parent = parent_obj,
         )
-        if created:
-            print('yeah it worked')
+        return HttpResponseRedirect(new_comment.content_object.get_absolute_url())
 
     comments = instance.comments  # Comment.objects.filter_by_instance(instance)
 
@@ -67,6 +81,8 @@ def post_detail(request, id=None):  # retrieve method
 
     return render(request, "post_detail.html", context)
 
+
+@login_required(login_url='/accounts/login/')
 def post_list(request):
     queryset_list = Post.objects.active() #.filter(draft=False).filter(publish__lte=timezone.now()) .all().order_by("-publish")
     query = request.GET.get('q')
@@ -96,6 +112,8 @@ def post_list(request):
     }
     return render(request, "post_list.html", context)
 
+
+@login_required(login_url='/accounts/login/')
 def post_update(request, id=None):
     instance = get_object_or_404(Post, id=id)
     form = PostForm(request.POST or None, request.FILES or None, instance=instance)
@@ -106,6 +124,7 @@ def post_update(request, id=None):
         messages.success(request, "Saved")
         return HttpResponseRedirect(instance.get_absolute_url())
 
+
     context = {
         "title": instance.title,
         "instance": instance,
@@ -113,6 +132,8 @@ def post_update(request, id=None):
     }
     return render(request, "post_form.html", context)
 
+
+@login_required(login_url='/accounts/login/')
 def post_delete(request, id=None):
     instance = get_object_or_404(Post, id=id)
     instance.delete()

@@ -24,7 +24,7 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^posts/', include('posts.urls', namespace='posts')),
     # two-step authentication 
-    url(r'^accounts/', include('registration.backends.hmac.urls')),
+    url(r'^accounts/', include('registration.backends.model_activation.urls')),
     # url(r'^posts/$', 'posts.views.post_home'), # absolute method
     # url(r'^posts/$', 'views.post_home'), # another method after views have been imported
     # url(r'^posts/$', '<appname>.views.<function_name'),

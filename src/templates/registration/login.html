@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load crispy_forms_tags %}
 {% load i18n %}
 
 {% block content %}
@@ -6,20 +7,29 @@
 <h3>Welcome Back</h3>
 <form method="post" action=".">{% csrf_token %}
 
-  <label>Username:</label><br />
-  {{ form.username }}<br /><br />
+  <div class="col-sm-4">
 
-  <label>Password:</label><br />
-  {{ form.password }}<br /><br />
+    {{ form|crispy }}
 
-  <input type="submit" value="{% trans 'Log in' %}" class="updateButton" style="width: 125px; height: 30px; padding-top: 5px; padding-bottom: 5px; line-height: 20px; color: #fff;" />
-  <input type="hidden" name="next" value="{{ next }}" />
+    <input type="submit" value="{% trans 'Log in' %}" class="btn btn-default" />
+    <input type="hidden" name="next" value="{{ next }}" />
+
+    <p>or</p>
+
+    <br>
+    <p style="font-size: 20px;">{% trans "Forgot password" %}? <a href="{% url "auth_password_reset" %}">{% trans "Reset it" %}</a></p>
+    <br>
+    <p style="font-size: 20px;">{% trans "Not member" %}? <a href="{% url "registration_register" %}">{% trans "Register" %}</a></p>
+
+
+  </div><br /><br />
+
+
+
+
 </form>
 
-<p style="font-size: 20px;">{% trans "Forgot password" %}? <a href="{% url "auth_password_reset" %}">{% trans "Reset it" %}</a></p>
-<p style="font-size: 20px;">{% trans "Not member" %}? <a href="{% url "registration_register" %}">{% trans "Register" %}</a></p>
-    
-    <p>or</p>
+
 
 </div>
 {% endblock %}
