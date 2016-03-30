@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.contrib.contenttypes.models import ContentType
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
 from django.http import HttpResponse, HttpResponseRedirect, Http404  # We can use this to test our views also
@@ -7,6 +8,8 @@ from django.utils import timezone
 
 from .forms import PostForm
 from .models import Post
+from comments.forms import CommentForm
+from comments.models import Comment
 # Create your views here.
 
 def post_create(request):
@@ -31,11 +34,37 @@ def post_detail(request, id=None):  # retrieve method
     # if instance.draft or instance.publish > timezone.now():
     #     if not request.user.is_staff or not request.user.is_superuser:
     #         raise Http404
+
+    initial_data = {
+        'content_type': instance.get_content_type,
+        'object_id': instance.id
+    }
+
+    form = CommentForm(request.POST or None, initial=initial_data)
+    if form.is_valid():
+        c_type = form.cleaned_data.get('content_type')
+        content_type = ContentType.objects.get(model=c_type)
+        obj_id = form.cleaned_data.get('object_id')
+        content_data = form.cleaned_data.get('content')
+        new_comment, created = Comment.objects.get_or_create(
+            user = request.user,
+            content_type = content_type,
+            object_id = obj_id,
+            content = content_data
+        )
+        if created:
+            print('yeah it worked')
+
+    comments = instance.comments  # Comment.objects.filter_by_instance(instance)
+
     context = {
         "title": instance.title,
-        "instance": instance
+        "instance": instance,
+        "comments": comments,
+        "comment_form": form,
         
     }
+
     return render(request, "post_detail.html", context)
 
 def post_list(request):
